@@ -15,11 +15,11 @@ load_dotenv()
 try:
     loader = PyPDFLoader("yolov9_paper.pdf")  # Replace with your PDF path
     data = loader.load()
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500)
     docs = text_splitter.split_documents(data)
     embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001") # Verify model name
     vectorstore = FAISS.from_documents(docs, embeddings)
-    retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 10})
+    retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 6})
     llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0, max_tokens=None, timeout=None) # Verify model name
 
     system_prompt = (
