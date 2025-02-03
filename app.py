@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 try:
-    loader = PyPDFLoader("EL Fayrouz")  # Replace with your PDF path
+    loader = PyPDFLoader("yolov9_paper.pdf")  # Replace with your PDF path
     data = loader.load()
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000)
     docs = text_splitter.split_documents(data)
@@ -44,7 +44,7 @@ except Exception as e:
     st.error(f"Error during initialization: {e}")
     st.stop()
 
-st.title("PDF Chatbot")
+st.title("EL Fayrouz")
 
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
