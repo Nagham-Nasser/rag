@@ -18,7 +18,7 @@ load_dotenv()
 app = FastAPI()
 
 # Initialize document loader and vector store
-loader = PyPDFLoader("yolov9_paper.pdf")
+loader = PyPDFLoader("yolov9_paper-1-2-1-2.pdf")
 data = loader.load()
 
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000)
