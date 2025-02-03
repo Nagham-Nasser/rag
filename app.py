@@ -57,17 +57,34 @@ for entry in st.session_state.chat_history:
 if "user_input" not in st.session_state:
     st.session_state.user_input = ""
 
-query = st.text_input("Enter your question:", value=st.session_state.user_input)
+query = st.text_input("Enter your question:", value=st.session_state.user_input, key="user_question")  # Add key
 
-if st.button("Submit"):
+# JavaScript to trigger button click on Enter
+st.markdown(
+    """
+    <script>
+    const input = document.getElementById('user_question');
+    input.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            const submitButton = document.querySelector('button');
+            submitButton.click();
+            event.preventDefault(); // Prevent default form submission
+        }
+    });
+    </script>
+    """,
+    unsafe_allow_html=True,
+)
+
+if st.button("Submit"):  # Keep the button for users without JavaScript
     if query:
         try:
             with st.spinner("Generating response..."):
                 response = rag_chain.invoke({"input": query})
                 answer = response["answer"]
                 st.session_state.chat_history.append({"prompt": query, "answer": answer})
-                st.session_state.user_input = ""  # Clear the input box
-                st.rerun()  # Use st.rerun()
+                st.session_state.user_input = ""
+                st.rerun()
 
         except Exception as e:
             st.error(f"Error generating response: {e}")
