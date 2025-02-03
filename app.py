@@ -48,7 +48,7 @@ except Exception as e:
     st.stop()
 
 # Streamlit app
-st.title("PDF Chatbot")
+st.title("EL Fayrouz")
 
 # Chat history (using Streamlit's session state)
 if "chat_history" not in st.session_state:
