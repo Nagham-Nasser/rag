@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain.vectorstores import Chroma  # Correct import
+from langchain.vectorstores import FAISS  # Use FAISS
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
@@ -18,17 +18,16 @@ load_dotenv()
 app = FastAPI()
 
 # Initialize document loader and vector store
-loader = PyPDFLoader("yolov9_paper.pdf")  # Make sure this file exists in the correct location
+loader = PyPDFLoader("yolov9_paper.pdf")
 data = loader.load()
 
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000)
 docs = text_splitter.split_documents(data)
 
-embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001") # Define embeddings separately
-vectorstore = Chroma.from_documents(
-    documents=docs,
-    embedding=embeddings # Use the embeddings instance here
-)
+embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+
+# Use FAISS instead of Chroma
+vectorstore = FAISS.from_documents(docs, embeddings)  # Create FAISS vectorstore
 
 retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 10})
 llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0, max_tokens=None, timeout=None)
@@ -48,7 +47,7 @@ prompt_template = ChatPromptTemplate.from_messages([
     ("human", "{input}")
 ])
 
-# Pydantic models for request and response
+# Pydantic models
 class QueryRequest(BaseModel):
     query: str
 
@@ -74,16 +73,11 @@ async def chat(request: QueryRequest):
     if "answer" not in response:
         raise HTTPException(status_code=500, detail="Failed to generate a response.")
 
-    # Store the query (prompt) and the answer in chat history
-    chat_history.append({
-        'prompt': query,
-        'answer': response["answer"]
-    })
+    chat_history.append({'prompt': query, 'answer': response["answer"]})
 
     return QueryResponse(prompt=query, answer=response["answer"])
 
 # Debugging endpoint for chat history
 @app.get("/chat_history", response_model=List[QueryResponse])
 async def get_chat_history():
-    # Return all stored queries (prompts) and their answers from chat history
     return [QueryResponse(prompt=entry['prompt'], answer=entry['answer']) for entry in chat_history]
