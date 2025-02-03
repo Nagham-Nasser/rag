@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 try:
-    loader = PyPDFLoader("yolov9_paper.pdf")  # Replace with your PDF path
+    loader = PyPDFLoader("EL Fayrouz")  # Replace with your PDF path
     data = loader.load()
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000)
     docs = text_splitter.split_documents(data)
