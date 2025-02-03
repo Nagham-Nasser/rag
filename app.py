@@ -47,7 +47,7 @@ except Exception as e:
 st.title("PDF Chatbot")
 
 if "chat_history" not in st.session_state:
-    st.session_state.chat_history =
+    st.session_state.chat_history = []
 
 for entry in st.session_state.chat_history:
     st.write(f"**You:** {entry['prompt']}")
